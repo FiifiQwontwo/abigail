@@ -6,20 +6,23 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 # User accounts Manager
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email, last_name, username, password=None, **extra_fields):
         if not email:
             raise ValueError('Users must have an email address')
         user = self.model(email=self.normalize_email(email), **extra_fields)
+        last_name = last_name,
+        username = username,
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password, **extra_fields):
+    def create_superuser(self, email, username, last_name, password, **extra_fields):
         """
         Creates and saves a superuser with the given email and password.
         """
         user = self.create_user(email, password=password, **extra_fields)
-
+        last_name = last_name,
+        username = username,
         user.is_admin = True
         user.is_active = True
         user.is_staff = True
@@ -30,6 +33,7 @@ class CustomUserManager(BaseUserManager):
 
 class BaseUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
+    last_name = models.CharField(max_length=255)
     username = models.CharField(max_length=100, unique=True)
     # required Fields
     date_joined = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
@@ -42,7 +46,7 @@ class BaseUser(AbstractBaseUser, PermissionsMixin):
 
     # login
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'last_name', 'phone']
+    REQUIRED_FIELDS = ['last_name']
     #  u will always need to end the class with() or natural key error awaits
     objects = CustomUserManager()
 
@@ -58,7 +62,7 @@ class BaseUser(AbstractBaseUser, PermissionsMixin):
 
 class EKKPastor(BaseUser):
     first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=50)
 
     def get_full_name(self):
         return self.first_name + " " + self.last_name
@@ -66,7 +70,7 @@ class EKKPastor(BaseUser):
 
 class Busscell(BaseUser):
     first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=50)
 
     def get_full_name(self):
         return self.first_name + " " + self.last_name
