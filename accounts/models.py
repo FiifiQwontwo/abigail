@@ -6,23 +6,23 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 # User accounts Manager
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, last_name, username, password=None, **extra_fields):
+    def create_user(self, email, last_name, password=None, **extra_fields):
         if not email:
             raise ValueError('Users must have an email address')
+        if not last_name:
+            raise ValueError('User must provide lastname')
         user = self.model(email=self.normalize_email(email), **extra_fields)
         last_name = last_name,
-        username = username,
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, last_name, password, **extra_fields):
+    def create_superuser(self, email, last_name, password, **extra_fields):
         """
         Creates and saves a superuser with the given email and password.
         """
-        user = self.create_user(email, password=password, **extra_fields)
+        user = self.create_user(email, last_name, password=password, **extra_fields)
         last_name = last_name,
-        username = username,
         user.is_admin = True
         user.is_active = True
         user.is_staff = True
@@ -34,7 +34,6 @@ class CustomUserManager(BaseUserManager):
 class BaseUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     last_name = models.CharField(max_length=255)
-    username = models.CharField(max_length=100, unique=True)
     # required Fields
     date_joined = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
     last_login = models.DateTimeField(verbose_name='last login', auto_now=True)

@@ -7,12 +7,15 @@ BaseUser = get_user_model()
 
 
 class EKKPastorAdmin(UserAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'is_active', 'date_joined')
+    list_display = ('email', 'first_name', 'last_name',)
+    ordering = ('last_name',)
 
 
 class BusscellAdmin(UserAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'is_active', 'date_joined')
+    list_display = ('email', 'first_name', 'last_name',)
+    ordering = ('last_name',)
 
 
 admin.site.register(EKKPastor, EKKPastorAdmin)
 admin.site.register(Busscell, BusscellAdmin)
+admin.site.register(BaseUser)
